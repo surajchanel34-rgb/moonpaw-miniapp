@@ -1,977 +1,825 @@
-import os
-import sqlite3
-import hashlib
-import hmac
-import time
-import json
-import threading
-from urllib.parse import parse_qsl
-
-import telebot
-from telebot import types
-from flask import Flask, request, jsonify
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MoonPaw</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #080d20;
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 520px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.logo {
+    font-size: 42px;
+}
+
+.title {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #9ca3c7;
+    margin-top: 5px;
+}
+
+.balance {
+    background: #151c3d;
+    border-radius: 22px;
+    padding: 22px;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.points {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.label {
+    color: #9ca3af;
+    margin-top: 5px;
+}
+
+.energy {
+    margin-top: 18px;
+    font-size: 18px;
+}
+
+.energy-bar {
+    height: 12px;
+    background: #303754;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.energy-fill {
+    height: 100%;
+    width: 100%;
+    background: #6d5dfc;
+    transition: width 0.2s;
+}
+
+.tap-area {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.tap-button {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: none;
+    background: #6d5dfc;
+    color: white;
+    font-size: 70px;
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(109,93,252,0.35);
+    transition: transform 0.1s;
+}
+
+.tap-button:active {
+    transform: scale(0.93);
+}
+
+.tap-hint {
+    margin-top: 12px;
+    color: #9ca3af;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.menu-button {
+    padding: 18px 10px;
+    border: none;
+    border-radius: 16px;
+    background: #1b2548;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menu-button:active {
+    transform: scale(0.97);
+}
+
+.panel {
+    display: none;
+    background: #151c3d;
+    border-radius: 22px;
+    padding: 20px;
+    margin-top: 18px;
+}
+
+.panel.active {
+    display: block;
+}
+
+.panel h2 {
+    margin-bottom: 14px;
+}
+
+.info {
+    color: #c4c8df;
+    line-height: 1.6;
+}
+
+.reward {
+    font-size: 24px;
+    margin: 15px 0;
+}
+
+.action-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: #6d5dfc;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.action-button:disabled {
+    opacity: 0.5;
+}
+
+.referral-box {
+    background: #0b1128;
+    padding: 12px;
+    border-radius: 12px;
+    word-break: break-all;
+    margin: 15px 0;
+    color: #aeb5df;
+}
+
+.rank-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 13px 5px;
+    border-bottom: 1px solid #293153;
+}
+
+.rank-row:last-child {
+    border-bottom: none;
+}
+
+.message {
+    text-align: center;
+    margin-top: 15px;
+    color: #9ca3af;
+    min-height: 22px;
+}
+
+.footer {
+    text-align: center;
+    color: #626987;
+    margin-top: 25px;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="logo">🌙🐾</div>
+        <div class="title">MoonPaw</div>
+        <div class="subtitle">Collect MoonPaw Points</div>
+    </div>
+
+    <div class="balance">
+
+        <div class="points" id="points">
+            0
+        </div>
+
+        <div class="label">
+            MOONPAW POINTS
+        </div>
+
+        <div class="energy">
+            ⚡ Energy:
+            <span id="energy">100</span>/100
+        </div>
+
+        <div class="energy-bar">
+            <div
+                class="energy-fill"
+                id="energyFill">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="tap-area">
+
+        <button
+            class="tap-button"
+            id="tapButton">
+            🐾
+        </button>
+
+        <div class="tap-hint">
+            Tap to earn +1 🐾
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button
+            class="menu-button"
+            onclick="showPanel('daily')">
+            🎁 Daily
+        </button>
+
+        <button
+            class="menu-button"
+            onclick="showPanel('invite')">
+            👥 Invite
+        </button>
+
+        <button
+            class="menu-button"
+            onclick="showPanel('rank')">
+            🏆 Rank
+        </button>
+
+        <button
+            class="menu-button"
+            onclick="showPanel('about')">
+            🌙 About
+        </button>
+
+    </div>
+
+    <!-- DAILY -->
+
+    <div
+        class="panel"
+        id="daily">
+
+        <h2>🎁 Daily Reward</h2>
+
+        <div class="info">
+            Come back every day and claim your reward.
+        </div>
+
+        <div class="reward">
+            +100 🐾
+        </div>
+
+        <button
+            class="action-button"
+            id="dailyButton"
+            onclick="claimDaily()">
+            Claim Daily Reward
+        </button>
+
+    </div>
+
+    <!-- INVITE -->
+
+    <div
+        class="panel"
+        id="invite">
+
+        <h2>👥 Invite Friends</h2>
+
+        <div class="info">
+            Invite friends to MoonPaw using your personal referral link.
+        </div>
+
+        <div class="referral-box" id="referralLink">
+            Creating link...
+        </div>
+
+        <button
+            class="action-button"
+            onclick="copyReferral()">
+            📋 Copy Referral Link
+        </button>
+
+        <div
+            class="message"
+            id="inviteMessage">
+        </div>
+
+    </div>
+
+    <!-- RANK -->
+
+    <div
+        class="panel"
+        id="rank">
+
+        <h2>🏆 Leaderboard</h2>
+
+        <div id="leaderboard">
+
+            <div class="rank-row">
+                <span>1. You</span>
+                <span id="yourRankPoints">0 🐾</span>
+            </div>
+
+            <div class="rank-row">
+                <span>2. MoonPaw Player</span>
+                <span>0 🐾</span>
+            </div>
+
+            <div class="rank-row">
+                <span>3. MoonPaw Player</span>
+                <span>0 🐾</span>
+            </div>
+
+        </div>
+
+        <div class="message">
+            Real server leaderboard will be connected later.
+        </div>
+
+    </div>
+
+    <!-- ABOUT -->
+
+    <div
+        class="panel"
+        id="about">
+
+        <h2>🌙 About MoonPaw</h2>
+
+        <div class="info">
+            MoonPaw is a tap-to-earn style game where players
+            collect MoonPaw points, manage energy, claim daily
+            rewards and invite friends.
+            <br><br>
+            Current points are game points and have no guaranteed
+            monetary value.
+        </div>
+
+    </div>
+
+    <div
+        class="message"
+        id="mainMessage">
+    </div>
+
+    <div class="footer">
+        🌙🐾 MoonPaw
+    </div>
+
+</div>
+
+<script>
+
+const tg = window.Telegram && window.Telegram.WebApp;
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
 
+/* =========================
+   GAME DATA
+========================= */
 
-# ============================================================
-# CONFIG
-# ============================================================
+const MAX_ENERGY = 100;
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+const REGEN_TIME = 60 * 1000;
 
-if not BOT_TOKEN:
-    raise RuntimeError("BOT_TOKEN is missing from environment variables")
+const DAILY_REWARD = 100;
 
-bot = telebot.TeleBot(BOT_TOKEN, threaded=True)
+let points =
+    Number(localStorage.getItem("moonpaw_points")) || 0;
+
+let energy =
+    Number(localStorage.getItem("moonpaw_energy"));
 
-DB_FILE = "moonpaw.db"
+if (isNaN(energy)) {
+    energy = MAX_ENERGY;
+}
 
-MAX_ENERGY = 100
-ENERGY_REGEN_SECONDS = 60
+let lastEnergyTime =
+    Number(localStorage.getItem("moonpaw_energy_time"));
 
-DAILY_REWARD = 100
-TAP_REWARD = 1
+if (!lastEnergyTime) {
+    lastEnergyTime = Date.now();
+}
 
-# Your GitHub Pages Mini App URL
-MINI_APP_URL = "https://surajchanel34-rgb.github.io/moonpaw-miniapp/"
+let lastDaily =
+    localStorage.getItem("moonpaw_daily") || "";
 
 
-# ============================================================
-# DATABASE
-# ============================================================
+/* =========================
+   SAVE
+========================= */
 
-def get_connection():
-    conn = sqlite3.connect(
-        DB_FILE,
-        timeout=30,
-        check_same_thread=False
-    )
-    conn.row_factory = sqlite3.Row
-    return conn
+function saveData() {
 
+    localStorage.setItem(
+        "moonpaw_points",
+        points
+    );
 
-def setup_database():
+    localStorage.setItem(
+        "moonpaw_energy",
+        energy
+    );
 
-    conn = get_connection()
-    cur = conn.cursor()
+    localStorage.setItem(
+        "moonpaw_energy_time",
+        lastEnergyTime
+    );
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY,
-            username TEXT,
-            points INTEGER DEFAULT 0,
-            referrals INTEGER DEFAULT 0,
-            energy INTEGER DEFAULT 100,
-            last_energy_time INTEGER DEFAULT 0,
-            last_daily TEXT DEFAULT '',
-            referred_by INTEGER DEFAULT NULL
-        )
-    """)
+    localStorage.setItem(
+        "moonpaw_daily",
+        lastDaily
+    );
+}
 
-    conn.commit()
-    conn.close()
 
+/* =========================
+   ENERGY
+========================= */
 
-# ============================================================
-# USER FUNCTIONS
-# ============================================================
+function regenerateEnergy() {
 
-def create_user(user_id, username=""):
+    const now = Date.now();
 
-    conn = get_connection()
-    cur = conn.cursor()
+    if (energy >= MAX_ENERGY) {
+        lastEnergyTime = now;
+        saveData();
+        return;
+    }
 
-    cur.execute(
-        "SELECT * FROM users WHERE user_id=?",
-        (user_id,)
-    )
+    const elapsed =
+        now - lastEnergyTime;
 
-    user = cur.fetchone()
+    const recovered =
+        Math.floor(elapsed / REGEN_TIME);
 
-    if user is None:
+    if (recovered > 0) {
 
-        cur.execute("""
-            INSERT INTO users
-            (
-                user_id,
-                username,
-                points,
-                referrals,
-                energy,
-                last_energy_time,
-                last_daily
-            )
-            VALUES (?, ?, 0, 0, 100, ?, '')
-        """, (
-            user_id,
-            username,
-            int(time.time())
-        ))
+        energy =
+            Math.min(
+                MAX_ENERGY,
+                energy + recovered
+            );
 
-        conn.commit()
+        lastEnergyTime +=
+            recovered * REGEN_TIME;
 
-    else:
+        saveData();
+    }
+}
 
-        if username and user["username"] != username:
 
-            cur.execute(
-                "UPDATE users SET username=? WHERE user_id=?",
-                (username, user_id)
-            )
+/* =========================
+   SCREEN
+========================= */
 
-            conn.commit()
+function updateScreen() {
 
-    conn.close()
+    regenerateEnergy();
 
+    document.getElementById(
+        "points"
+    ).textContent =
+        points.toLocaleString();
 
-def regenerate_energy(user_id):
+    document.getElementById(
+        "energy"
+    ).textContent =
+        energy;
 
-    conn = get_connection()
-    cur = conn.cursor()
+    const percentage =
+        (energy / MAX_ENERGY) * 100;
 
-    cur.execute(
-        "SELECT energy, last_energy_time FROM users WHERE user_id=?",
-        (user_id,)
-    )
+    document.getElementById(
+        "energyFill"
+    ).style.width =
+        percentage + "%";
 
-    user = cur.fetchone()
+    document.getElementById(
+        "yourRankPoints"
+    ).textContent =
+        points.toLocaleString() + " 🐾";
 
-    if user is None:
-        conn.close()
-        return 100
+    const today =
+        new Date().toDateString();
 
-    energy = user["energy"]
-    last_time = user["last_energy_time"]
+    const dailyButton =
+        document.getElementById(
+            "dailyButton"
+        );
 
-    now = int(time.time())
+    if (lastDaily === today) {
 
-    if last_time <= 0:
-        last_time = now
+        dailyButton.disabled = true;
 
-    elapsed = now - last_time
+        dailyButton.textContent =
+            "✅ Already Claimed";
 
-    recovered = elapsed // ENERGY_REGEN_SECONDS
+    } else {
 
-    if recovered > 0:
+        dailyButton.disabled = false;
 
-        energy = min(
-            MAX_ENERGY,
-            energy + recovered
-        )
+        dailyButton.textContent =
+            "Claim Daily Reward";
+    }
+}
 
-        new_time = (
-            last_time
-            + recovered * ENERGY_REGEN_SECONDS
-        )
 
-        cur.execute("""
-            UPDATE users
-            SET energy=?, last_energy_time=?
-            WHERE user_id=?
-        """, (
-            energy,
-            new_time,
-            user_id
-        ))
+/* =========================
+   TAP
+========================= */
 
-        conn.commit()
+document.getElementById(
+    "tapButton"
+).addEventListener(
+    "click",
+    function() {
 
-    conn.close()
+        regenerateEnergy();
 
-    return energy
+        if (energy <= 0) {
 
+            showMessage(
+                "⚡ No energy! Wait for it to regenerate."
+            );
 
-def get_user(user_id):
+            return;
+        }
 
-    regenerate_energy(user_id)
+        points += 1;
 
-    conn = get_connection()
-    cur = conn.cursor()
+        energy -= 1;
 
-    cur.execute(
-        "SELECT * FROM users WHERE user_id=?",
-        (user_id,)
-    )
+        if (energy < MAX_ENERGY &&
+            !lastEnergyTime) {
 
-    user = cur.fetchone()
+            lastEnergyTime =
+                Date.now();
+        }
 
-    conn.close()
+        saveData();
 
-    return user
+        updateScreen();
 
+        showMessage("+1 🐾");
 
-# ============================================================
-# TELEGRAM MINI APP AUTHENTICATION
-# ============================================================
+    }
+);
 
-def validate_init_data(init_data):
 
-    if not init_data:
-        return None
+/* =========================
+   DAILY
+========================= */
 
-    try:
+function claimDaily() {
 
-        data = dict(parse_qsl(init_data, keep_blank_values=True))
+    const today =
+        new Date().toDateString();
 
-        received_hash = data.pop("hash", None)
+    if (lastDaily === today) {
 
-        if not received_hash:
-            return None
+        showMessage(
+            "🎁 You already claimed today's reward."
+        );
 
-        data_check_string = "\n".join(
-            f"{key}={data[key]}"
-            for key in sorted(data.keys())
-        )
+        return;
+    }
 
-        secret_key = hmac.new(
-            b"WebAppData",
-            BOT_TOKEN.encode(),
-            hashlib.sha256
-        ).digest()
+    points += DAILY_REWARD;
 
-        calculated_hash = hmac.new(
-            secret_key,
-            data_check_string.encode(),
-            hashlib.sha256
-        ).hexdigest()
+    lastDaily = today;
 
-        if not hmac.compare_digest(
-            calculated_hash,
-            received_hash
-        ):
-            return None
+    saveData();
 
-        # Prevent very old Mini App authentication data.
-        auth_date = int(data.get("auth_date", "0"))
+    updateScreen();
 
-        if int(time.time()) - auth_date > 86400:
-            return None
+    showMessage(
+        "🎁 +" +
+        DAILY_REWARD +
+        " MoonPaw Points!"
+    );
+}
 
-        user_data = json.loads(
-            data.get("user", "{}")
-        )
 
-        return user_data
+/* =========================
+   PANELS
+========================= */
 
-    except Exception as e:
+function showPanel(name) {
 
-        print(
-            "Mini App authentication error:",
-            e,
-            flush=True
-        )
+    const panels =
+        document.querySelectorAll(
+            ".panel"
+        );
 
-        return None
+    panels.forEach(
+        function(panel) {
+            panel.classList.remove(
+                "active"
+            );
+        }
+    );
 
+    const selected =
+        document.getElementById(name);
 
-def get_authenticated_user():
+    if (selected) {
+        selected.classList.add(
+            "active"
+        );
+    }
 
-    init_data = request.headers.get(
-        "X-Telegram-Init-Data",
-        ""
-    )
+    if (name === "invite") {
+        createReferralLink();
+    }
 
-    user_data = validate_init_data(init_data)
+    if (name === "rank") {
+        updateLeaderboard();
+    }
+}
 
-    if not user_data:
-        return None
 
-    user_id = user_data.get("id")
+/* =========================
+   REFERRAL
+========================= */
 
-    if not user_id:
-        return None
+function createReferralLink() {
 
-    username = (
-        user_data.get("username")
-        or user_data.get("first_name")
-        or "Player"
-    )
+    let userId = null;
 
-    create_user(
-        user_id,
-        username
-    )
+    if (
+        tg &&
+        tg.initDataUnsafe &&
+        tg.initDataUnsafe.user
+    ) {
 
-    return user_data
+        userId =
+            tg.initDataUnsafe.user.id;
+    }
 
+    if (!userId) {
 
-# ============================================================
-# FLASK API
-# ============================================================
+        userId =
+            "demo_" +
+            Math.floor(
+                Math.random() * 999999
+            );
+    }
 
-app = Flask(__name__)
+    const botUsername =
+        "MoonPaw_Airdropbot";
 
+    const link =
+        "https://t.me/" +
+        botUsername +
+        "?start=ref_" +
+        userId;
 
-@app.after_request
-def add_cors_headers(response):
+    document.getElementById(
+        "referralLink"
+    ).textContent = link;
+}
 
-    response.headers["Access-Control-Allow-Origin"] = "*"
 
-    response.headers["Access-Control-Allow-Headers"] = (
-        "Content-Type, X-Telegram-Init-Data"
-    )
+function copyReferral() {
 
-    response.headers["Access-Control-Allow-Methods"] = (
-        "GET, POST, OPTIONS"
-    )
+    const text =
+        document.getElementById(
+            "referralLink"
+        ).textContent;
 
-    return response
+    if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ) {
 
+        navigator.clipboard.writeText(
+            text
+        ).then(
+            function() {
 
-@app.route("/api/health", methods=["GET"])
-def health():
+                document.getElementById(
+                    "inviteMessage"
+                ).textContent =
+                    "✅ Referral link copied!";
 
-    return jsonify({
-        "status": "ok",
-        "game": "MoonPaw"
-    })
+            }
+        );
 
+    } else {
 
-# ============================================================
-# PLAYER INFO
-# ============================================================
+        showMessage(
+            "📋 Copy the referral link manually."
+        );
+    }
+}
 
-@app.route("/api/me", methods=["GET"])
-def api_me():
 
-    user_data = get_authenticated_user()
+/* =========================
+   LOCAL LEADERBOARD
+========================= */
 
-    if not user_data:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
+function updateLeaderboard() {
 
-    user_id = user_data["id"]
+    document.getElementById(
+        "yourRankPoints"
+    ).textContent =
+        points.toLocaleString() +
+        " 🐾";
+}
 
-    user = get_user(user_id)
 
-    bot_username = bot.get_me().username
+/* =========================
+   MESSAGE
+========================= */
 
-    referral_link = (
-        f"https://t.me/{bot_username}"
-        f"?start=ref_{user_id}"
-    )
+let messageTimer;
 
-    return jsonify({
-        "user_id": user_id,
-        "username": user["username"],
-        "points": user["points"],
-        "energy": user["energy"],
-        "max_energy": MAX_ENERGY,
-        "referrals": user["referrals"],
-        "referral_link": referral_link
-    })
+function showMessage(text) {
 
+    const message =
+        document.getElementById(
+            "mainMessage"
+        );
 
-# ============================================================
-# TAP
-# ============================================================
+    message.textContent = text;
 
-@app.route("/api/tap", methods=["POST"])
-def api_tap():
+    clearTimeout(messageTimer);
 
-    user_data = get_authenticated_user()
+    messageTimer =
+        setTimeout(
+            function() {
+                message.textContent = "";
+            },
+            2000
+        );
+}
 
-    if not user_data:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
 
-    user_id = user_data["id"]
+/* =========================
+   AUTO ENERGY UPDATE
+========================= */
 
-    create_user(
-        user_id,
-        user_data.get("username", "")
-    )
+setInterval(
+    function() {
 
-    energy = regenerate_energy(user_id)
+        regenerateEnergy();
 
-    if energy <= 0:
+        updateScreen();
 
-        return jsonify({
-            "error": "No energy",
-            "points": get_user(user_id)["points"],
-            "energy": 0
-        }), 400
+    },
+    1000
+);
 
-    conn = get_connection()
-    cur = conn.cursor()
 
-    cur.execute("""
-        UPDATE users
-        SET points = points + 1,
-            energy = energy - 1
-        WHERE user_id=?
-    """, (
-        user_id,
-    ))
+/* =========================
+   START
+========================= */
 
-    conn.commit()
-    conn.close()
+updateScreen();
 
-    user = get_user(user_id)
+</script>
 
-    return jsonify({
-        "success": True,
-        "points": user["points"],
-        "energy": user["energy"]
-    })
-
-
-# ============================================================
-# DAILY REWARD
-# ============================================================
-
-@app.route("/api/daily", methods=["POST"])
-def api_daily():
-
-    user_data = get_authenticated_user()
-
-    if not user_data:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
-
-    user_id = user_data["id"]
-
-    user = get_user(user_id)
-
-    today = time.strftime("%Y-%m-%d")
-
-    if user["last_daily"] == today:
-
-        return jsonify({
-            "success": False,
-            "message": "Daily reward already claimed",
-            "points": user["points"]
-        }), 400
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE users
-        SET points = points + ?,
-            last_daily = ?
-        WHERE user_id=?
-    """, (
-        DAILY_REWARD,
-        today,
-        user_id
-    ))
-
-    conn.commit()
-    conn.close()
-
-    user = get_user(user_id)
-
-    return jsonify({
-        "success": True,
-        "reward": DAILY_REWARD,
-        "points": user["points"]
-    })
-
-
-# ============================================================
-# LEADERBOARD
-# ============================================================
-
-@app.route("/api/leaderboard", methods=["GET"])
-def api_leaderboard():
-
-    user_data = get_authenticated_user()
-
-    if not user_data:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT username, points
-        FROM users
-        ORDER BY points DESC
-        LIMIT 20
-    """)
-
-    rows = cur.fetchall()
-
-    conn.close()
-
-    leaderboard = []
-
-    for index, row in enumerate(rows, 1):
-
-        leaderboard.append({
-            "rank": index,
-            "username": row["username"] or "Player",
-            "points": row["points"]
-        })
-
-    return jsonify({
-        "leaderboard": leaderboard
-    })
-
-
-# ============================================================
-# REFERRAL INFO
-# ============================================================
-
-@app.route("/api/referral", methods=["GET"])
-def api_referral():
-
-    user_data = get_authenticated_user()
-
-    if not user_data:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
-
-    user_id = user_data["id"]
-
-    user = get_user(user_id)
-
-    bot_username = bot.get_me().username
-
-    referral_link = (
-        f"https://t.me/{bot_username}"
-        f"?start=ref_{user_id}"
-    )
-
-    return jsonify({
-        "referrals": user["referrals"],
-        "referral_link": referral_link
-    })
-
-
-# ============================================================
-# TELEGRAM BOT
-# ============================================================
-
-def main_menu():
-
-    keyboard = types.InlineKeyboardMarkup(
-        row_width=2
-    )
-
-    keyboard.add(
-        types.InlineKeyboardButton(
-            "🐾 TAP +1",
-            callback_data="tap"
-        ),
-        types.InlineKeyboardButton(
-            "🎁 DAILY",
-            callback_data="daily"
-        )
-    )
-
-    keyboard.add(
-        types.InlineKeyboardButton(
-            "👥 INVITE",
-            callback_data="invite"
-        ),
-        types.InlineKeyboardButton(
-            "🏆 RANK",
-            callback_data="rank"
-        )
-    )
-
-    keyboard.add(
-        types.InlineKeyboardButton(
-            "🌙 OPEN MOONPAW",
-            web_app=types.WebAppInfo(
-                url=MINI_APP_URL
-            )
-        )
-    )
-
-    return keyboard
-
-
-@bot.message_handler(commands=["start"])
-def start_command(message):
-
-    user_id = message.from_user.id
-
-    username = (
-        message.from_user.username
-        or message.from_user.first_name
-        or "Player"
-    )
-
-    create_user(
-        user_id,
-        username
-    )
-
-    # Referral processing
-    parts = message.text.split(maxsplit=1)
-
-    if len(parts) > 1:
-
-        payload = parts[1]
-
-        if payload.startswith("ref_"):
-
-            try:
-
-                referrer_id = int(
-                    payload.replace("ref_", "")
-                )
-
-                if referrer_id != user_id:
-
-                    conn = get_connection()
-                    cur = conn.cursor()
-
-                    cur.execute(
-                        "SELECT referred_by FROM users WHERE user_id=?",
-                        (user_id,)
-                    )
-
-                    current = cur.fetchone()
-
-                    if current and current["referred_by"] is None:
-
-                        cur.execute("""
-                            UPDATE users
-                            SET referred_by=?
-                            WHERE user_id=?
-                        """, (
-                            referrer_id,
-                            user_id
-                        ))
-
-                        cur.execute("""
-                            UPDATE users
-                            SET referrals = referrals + 1,
-                                points = points + 50
-                            WHERE user_id=?
-                        """, (
-                            referrer_id,
-                        ))
-
-                        cur.execute("""
-                            UPDATE users
-                            SET points = points + 25
-                            WHERE user_id=?
-                        """, (
-                            user_id,
-                        ))
-
-                        conn.commit()
-
-                    conn.close()
-
-            except Exception as e:
-
-                print(
-                    "Referral error:",
-                    e,
-                    flush=True
-                )
-
-    text = """
-🌙🐾 *WELCOME TO MOONPAW!*
-
-Collect MoonPaw points and climb the leaderboard.
-
-🐾 TAP +1 — Earn points
-🎁 DAILY — Daily reward
-👥 INVITE — Invite friends
-🏆 RANK — Leaderboard
-
-🚀 Open the Mini App below!
-"""
-
-    bot.send_message(
-        message.chat.id,
-        text,
-        parse_mode="Markdown",
-        reply_markup=main_menu()
-    )
-
-
-# ============================================================
-# BOT TAP
-# ============================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data == "tap"
-)
-def tap(call):
-
-    user_id = call.from_user.id
-
-    create_user(
-        user_id,
-        call.from_user.username
-        or call.from_user.first_name
-        or "Player"
-    )
-
-    energy = regenerate_energy(user_id)
-
-    if energy <= 0:
-
-        bot.answer_callback_query(
-            call.id,
-            "⚡ No energy!"
-        )
-
-        return
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE users
-        SET points = points + 1,
-            energy = energy - 1
-        WHERE user_id=?
-    """, (
-        user_id,
-    ))
-
-    conn.commit()
-    conn.close()
-
-    user = get_user(user_id)
-
-    bot.answer_callback_query(
-        call.id,
-        "+1 🐾"
-    )
-
-    try:
-
-        bot.edit_message_text(
-            f"""
-🌙🐾 *MOONPAW*
-
-💰 Points: *{user["points"]:,}*
-⚡ Energy: *{user["energy"]}/{MAX_ENERGY}*
-
-Keep tapping! 🐾
-""",
-            call.message.chat.id,
-            call.message.message_id,
-            parse_mode="Markdown",
-            reply_markup=main_menu()
-        )
-
-    except Exception:
-        pass
-
-
-# ============================================================
-# DAILY
-# ============================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data == "daily"
-)
-def daily(call):
-
-    user_id = call.from_user.id
-
-    user = get_user(user_id)
-
-    today = time.strftime("%Y-%m-%d")
-
-    if user["last_daily"] == today:
-
-        bot.answer_callback_query(
-            call.id,
-            "🎁 Already claimed today!",
-            show_alert=True
-        )
-
-        return
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE users
-        SET points = points + ?,
-            last_daily = ?
-        WHERE user_id=?
-    """, (
-        DAILY_REWARD,
-        today,
-        user_id
-    ))
-
-    conn.commit()
-    conn.close()
-
-    bot.answer_callback_query(
-        call.id,
-        f"+{DAILY_REWARD} 🐾"
-    )
-
-    bot.send_message(
-        call.message.chat.id,
-        f"🎁 Daily reward claimed!\n\n+{DAILY_REWARD} 🐾",
-        reply_markup=main_menu()
-    )
-
-
-# ============================================================
-# INVITE
-# ============================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data == "invite"
-)
-def invite(call):
-
-    bot_username = bot.get_me().username
-
-    link = (
-        f"https://t.me/{bot_username}"
-        f"?start=ref_{call.from_user.id}"
-    )
-
-    text = f"""
-👥 *INVITE FRIENDS*
-
-Your referral link:
-
-`{link}`
-
-🎁 Friend joins:
-• Friend gets +25 🐾
-• You get +50 🐾
-"""
-
-    bot.answer_callback_query(call.id)
-
-    bot.send_message(
-        call.message.chat.id,
-        text,
-        parse_mode="Markdown"
-    )
-
-
-# ============================================================
-# RANK
-# ============================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data == "rank"
-)
-def rank(call):
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT username, points
-        FROM users
-        ORDER BY points DESC
-        LIMIT 10
-    """)
-
-    users = cur.fetchall()
-
-    conn.close()
-
-    text = "🏆 *MOONPAW LEADERBOARD*\n\n"
-
-    if not users:
-
-        text += "No players yet."
-
-    else:
-
-        for index, user in enumerate(users, 1):
-
-            username = user["username"] or "Player"
-
-            text += (
-                f"{index}. "
-                f"@{username} — "
-                f"{user['points']:,} 🐾\n"
-            )
-
-    bot.answer_callback_query(call.id)
-
-    bot.send_message(
-        call.message.chat.id,
-        text,
-        parse_mode="Markdown"
-    )
-
-
-# ============================================================
-# HELP
-# ============================================================
-
-@bot.message_handler(commands=["help"])
-def help_command(message):
-
-    bot.send_message(
-        message.chat.id,
-        """
-🌙🐾 *MoonPaw Help*
-
-/start — Open MoonPaw
-/help — Show help
-
-Use the buttons to play!
-""",
-        parse_mode="Markdown",
-        reply_markup=main_menu()
-    )
-
-
-# ============================================================
-# START API SERVER
-# ============================================================
-
-def run_api():
-
-    port = int(
-        os.getenv("PORT", "8080")
-    )
-
-    print(
-        f"🌐 MoonPaw API starting on port {port}",
-        flush=True
-    )
-
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=False,
-        use_reloader=False
-    )
-
-
-# ============================================================
-# START EVERYTHING
-# ============================================================
-
-if __name__ == "__main__":
-
-    setup_database()
-
-    api_thread = threading.Thread(
-        target=run_api,
-        daemon=True
-    )
-
-    api_thread.start()
-
-    print(
-        "🌙🐾 MoonPaw bot is running!",
-        flush=True
-    )
-
-    bot.infinity_polling(
-        timeout=30,
-        long_polling_timeout=30
-    )
+</body>
+    </html>                
