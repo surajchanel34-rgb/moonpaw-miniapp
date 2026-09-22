@@ -80,4 +80,167 @@
       padding: 17px 10px;
       border: none;
       border-radius: 15px;
+      background: #1b2542;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .message {
+      min-height: 25px;
+      margin-top: 20px;
+      color: #a5b4fc;
+    }
+
+    .energy {
+      margin: 15px 0 25px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <h1>🌙🐾 MoonPaw</h1>
+
+    <div class="subtitle">
+      Tap and collect MoonPaw points
+    </div>
+
+    <div class="balance">
+      <div class="points" id="points">0</div>
+      <div class="label">MOONPAW POINTS</div>
+    </div>
+
+    <button class="tap-button" id="tapButton">🐾</button>
+
+    <div class="energy">
+      ⚡ Energy: <span id="energy">100</span>/100
+    </div>
+
+    <div class="buttons">
+
+      <button class="menu-button" id="dailyButton">🎁 Daily</button>
+
+      <button class="menu-button" id="inviteButton">👥 Invite</button>
+
+      <button class="menu-button" id="rankButton">🏆 Rank</button>
+
+      <button class="menu-button" id="upgradeButton">⚡ Upgrade</button>
+
+    </div>
+
+    <div class="message" id="message"></div>
+
+  </div>
+
+  <script>
+
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    let points = 0;
+    let energy = 100;
+
+    const pointsElement = document.getElementById("points");
+    const energyElement = document.getElementById("energy");
+    const messageElement = document.getElementById("message");
+
+    function updateScreen() {
+      pointsElement.innerText = points.toLocaleString();
+      energyElement.innerText = energy;
+    }
+
+    document.getElementById("tapButton").addEventListener("click", function () {
+
+      if (energy <= 0) {
+        messageElement.innerText = "⚡ No energy! Come back later.";
+        return;
+      }
+
+      points += 1;
+      energy -= 1;
+
+      updateScreen();
+
+      messageElement.innerText = "+1 🐾";
+
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred("light");
+      }
+    });
+
+    document.getElementById("dailyButton").addEventListener("click", function () {
+      messageElement.innerText = "🎁 Daily reward coming soon!";
+    });
+
+    document.getElementById("inviteButton").addEventListener("click", function () {
+      if (tg.showAlert) {
+        tg.showAlert("Invite your friends and earn MoonPaw rewards!");
+      }
+    });
+
+    document.getElementById("rankButton").addEventListener("click", function () {
+      messageElement.innerText = "🏆 Leaderboard coming soon!";
+    });
+
+    document.getElementById("upgradeButton").addEventListener("click", function () {
+      messageElement.innerText = "⚡ Upgrade system coming soon!";
+    });
+
+    updateScreen();
+
+  </script>
+
+</body>
+</html>      margin-bottom: 25px;
+    }
+
+    .balance {
+      background: #151c33;
+      border-radius: 22px;
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .points {
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    .label {
+      color: #9ca3af;
+      margin-top: 5px;
+    }
+
+    .tap-button {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: none;
+      font-size: 70px;
+      background: #6d5dfc;
+      box-shadow: 0 10px 35px rgba(109, 93, 252, 0.35);
+      cursor: pointer;
+      margin: 10px 0 30px;
+    }
+
+    .tap-button:active {
+      transform: scale(0.94);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .menu-button {
+      padding: 17px 10px;
+      border: none;
+      border-radius: 15px;
       background: #1b254
