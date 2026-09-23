@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>MoonPaw</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -13,133 +12,439 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     font-family: Arial, sans-serif;
-    background: #080d20;
+    background:
+        radial-gradient(circle at 50% 35%, #241900 0%, #090909 35%, #050505 100%);
     color: white;
     min-height: 100vh;
-    padding: 20px;
+    padding-bottom: 95px;
 }
 
-.container {
-    max-width: 520px;
+.app {
+    width: 100%;
+    max-width: 600px;
     margin: auto;
+    padding: 18px 14px;
 }
+
+/* ================= HEADER ================= */
 
 .header {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 18px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 9px;
 }
 
 .logo {
-    font-size: 42px;
+    font-size: 37px;
 }
 
-.title {
-    font-size: 30px;
+.logo-text {
+    font-size: 23px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.tagline {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #a7a7a7;
+    margin-top: 2px;
+}
+
+.connected {
+    border: 1px solid #76551a;
+    background: rgba(30, 24, 12, 0.8);
+    border-radius: 20px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+}
+
+.online {
+    width: 8px;
+    height: 8px;
+    background: #45e67d;
+    border-radius: 50%;
+}
+
+/* ================= PROFILE ================= */
+
+.profile-card {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 8px;
+    border: 1px solid #4b3816;
+    border-radius: 20px;
+    background: rgba(16,16,16,.92);
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid #ffbf27;
+    background: #181818;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 31px;
+}
+
+.username {
     font-weight: bold;
+    font-size: 15px;
 }
 
-.subtitle {
-    color: #9ca3c7;
+.level {
+    color: #aaa;
+    font-size: 11px;
     margin-top: 5px;
 }
 
-.balance {
-    background: #151c3d;
-    border-radius: 22px;
-    padding: 22px;
-    text-align: center;
-    margin-bottom: 18px;
+.progress {
+    width: 100%;
+    height: 6px;
+    background: #292929;
+    border-radius: 10px;
+    margin-top: 7px;
+    overflow: hidden;
 }
 
-.points {
-    font-size: 42px;
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #ffc52b;
+}
+
+.stat-box {
+    border: 1px solid #594318;
+    border-radius: 15px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-title {
+    color: #999;
+    font-size: 10px;
+}
+
+.stat-value {
+    color: #ffc52b;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.stat-small {
+    color: #aaa;
+    font-size: 9px;
+    margin-top: 3px;
+}
+
+/* ================= COIN ================= */
+
+.coin-area {
+    height: 350px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.coin-glow {
+    position: absolute;
+    width: 245px;
+    height: 245px;
+    border-radius: 50%;
+    background: rgba(255, 184, 20, .10);
+    box-shadow:
+        0 0 45px rgba(255, 183, 20, .35),
+        0 0 100px rgba(255, 183, 20, .12);
+}
+
+.coin {
+    width: 205px;
+    height: 205px;
+    border-radius: 50%;
+    border: 8px solid #a96708;
+    background:
+        radial-gradient(circle at 35% 25%, #fff1a0, #ffc21c 35%, #d98600 70%, #8d4f00);
+    box-shadow:
+        0 0 20px #ffb300,
+        0 0 60px rgba(255,174,0,.45),
+        inset 0 0 25px rgba(255,255,255,.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 88px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    z-index: 2;
+    transition: transform .08s;
+}
+
+.coin:active {
+    transform: scale(.91);
+}
+
+.coin-inner {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tap-label {
+    position: absolute;
+    top: 18px;
+    left: 8px;
+    color: #ddd;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tap-label strong {
+    color: white;
+    font-size: 17px;
+}
+
+/* ================= +1 POPUP ================= */
+
+.plus-one {
+    position: absolute;
+    z-index: 10;
+    color: #ffd447;
+    font-size: 31px;
+    font-weight: 900;
+    pointer-events: none;
+    animation: floatUp .8s ease-out forwards;
+    text-shadow: 0 0 15px #ffb300;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-110px) scale(1.25);
+    }
+}
+
+/* ================= ENERGY ================= */
+
+.energy-card {
+    border: 1px solid #4f3b16;
+    border-radius: 20px;
+    background: rgba(16,16,16,.9);
+    padding: 17px;
+    margin-bottom: 15px;
+}
+
+.energy-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.energy-title {
+    color: #ffc52b;
     font-weight: bold;
 }
 
-.label {
-    color: #9ca3af;
-    margin-top: 5px;
-}
-
-.energy {
-    margin-top: 18px;
-    font-size: 18px;
+.energy-number {
+    color: #aaa;
 }
 
 .energy-bar {
-    height: 12px;
-    background: #303754;
+    height: 13px;
+    background: #282828;
     border-radius: 20px;
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: 12px;
 }
 
 .energy-fill {
     height: 100%;
     width: 100%;
-    background: #6d5dfc;
-    transition: width 0.2s;
+    background: linear-gradient(90deg,#e88c00,#ffd83d);
+    transition: width .3s;
 }
 
-.tap-area {
-    text-align: center;
-    margin: 20px 0;
+.energy-timer {
+    color: #999;
+    font-size: 11px;
+    margin-top: 9px;
 }
 
-.tap-button {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    border: none;
-    background: #6d5dfc;
-    color: white;
-    font-size: 70px;
-    cursor: pointer;
-    box-shadow: 0 10px 35px rgba(109,93,252,0.35);
-    transition: transform 0.1s;
-}
+/* ================= QUICK MENU ================= */
 
-.tap-button:active {
-    transform: scale(0.93);
-}
-
-.tap-hint {
-    margin-top: 12px;
-    color: #9ca3af;
-}
-
-.buttons {
+.quick-menu {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
-.menu-button {
-    padding: 18px 10px;
-    border: none;
-    border-radius: 16px;
-    background: #1b2548;
+.quick-button {
+    min-height: 90px;
+    border: 1px solid #4b3817;
+    border-radius: 17px;
+    background: linear-gradient(145deg,#171717,#0d0d0d);
     color: white;
-    font-size: 17px;
-    font-weight: bold;
+    padding: 9px 4px;
     cursor: pointer;
 }
 
-.menu-button:active {
-    transform: scale(0.97);
+.quick-icon {
+    font-size: 26px;
+    margin-bottom: 7px;
 }
+
+.quick-name {
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.quick-sub {
+    color: #888;
+    font-size: 9px;
+    margin-top: 5px;
+}
+
+/* ================= DAILY ================= */
+
+.daily-card {
+    border: 1px solid #5c4215;
+    border-radius: 20px;
+    background: rgba(16,16,16,.92);
+    padding: 16px;
+    margin-bottom: 15px;
+}
+
+.daily-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+}
+
+.daily-title {
+    color: #ffc52b;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.day-count {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.daily-days {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 5px;
+}
+
+.day {
+    min-height: 88px;
+    border: 1px solid #3c3c3c;
+    border-radius: 12px;
+    background: #121212;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.day.active {
+    border-color: #ffc52b;
+    box-shadow: 0 0 12px rgba(255,197,43,.22);
+}
+
+.day.claimed {
+    background: linear-gradient(145deg,#4c3510,#17120a);
+}
+
+.day-name {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.day-icon {
+    font-size: 21px;
+    margin: 5px 0;
+}
+
+.day-reward {
+    color: #ffc52b;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.day-lock {
+    color: #777;
+    font-size: 10px;
+}
+
+.claim-button {
+    width: 100%;
+    margin-top: 13px;
+    border: none;
+    border-radius: 15px;
+    padding: 14px;
+    background: #ffc52b;
+    color: #15110a;
+    font-weight: 900;
+    font-size: 15px;
+}
+
+.claim-button:disabled {
+    background: #26272e;
+    color: #777;
+}
+
+/* ================= PANELS ================= */
 
 .panel {
     display: none;
-    background: #151c3d;
-    border-radius: 22px;
+    border: 1px solid #4b3817;
+    border-radius: 20px;
+    background: #111;
     padding: 20px;
-    margin-top: 18px;
+    margin-bottom: 15px;
 }
 
 .panel.active {
@@ -147,679 +452,237 @@ body {
 }
 
 .panel h2 {
-    margin-bottom: 14px;
+    color: #ffc52b;
+    margin-bottom: 15px;
 }
 
-.info {
-    color: #c4c8df;
+.panel-text {
+    color: #aaa;
     line-height: 1.6;
 }
 
-.reward {
-    font-size: 24px;
-    margin: 15px 0;
-}
-
-.action-button {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 14px;
-    background: #6d5dfc;
-    color: white;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.action-button:disabled {
-    opacity: 0.5;
-}
-
-.referral-box {
-    background: #0b1128;
-    padding: 12px;
+.referral {
+    margin-top: 15px;
+    background: #080808;
+    border: 1px solid #333;
     border-radius: 12px;
+    padding: 12px;
     word-break: break-all;
-    margin: 15px 0;
-    color: #aeb5df;
+    color: #bbb;
+}
+
+.action {
+    width: 100%;
+    border: 1px solid #76551b;
+    background: #17130a;
+    color: #ffc52b;
+    padding: 14px;
+    border-radius: 14px;
+    margin-top: 12px;
+    font-weight: bold;
 }
 
 .rank-row {
     display: flex;
     justify-content: space-between;
     padding: 13px 5px;
-    border-bottom: 1px solid #293153;
+    border-bottom: 1px solid #292929;
 }
 
 .rank-row:last-child {
-    border-bottom: none;
+    border: none;
 }
 
-.message {
-    text-align: center;
-    margin-top: 15px;
-    color: #9ca3af;
-    min-height: 22px;
+/* ================= BOTTOM NAV ================= */
+
+.bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    width: calc(100% - 20px);
+    max-width: 580px;
+    height: 72px;
+    background: rgba(13,13,13,.97);
+    border: 1px solid #3f351f;
+    border-radius: 25px;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    z-index: 100;
+    backdrop-filter: blur(12px);
 }
 
-.footer {
-    text-align: center;
-    color: #626987;
-    margin-top: 25px;
-    font-size: 13px;
+.nav-button {
+    border: none;
+    background: transparent;
+    color: #777;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.nav-icon {
+    font-size: 24px;
+}
+
+.nav-button.active {
+    color: #ffc52b;
+}
+
+.nav-button.active .nav-icon {
+    filter: drop-shadow(0 0 7px #ffb300);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:430px) {
+
+    .logo-text {
+        font-size: 19px;
+    }
+
+    .connected {
+        font-size: 9px;
+        padding: 8px;
+    }
+
+    .profile-card {
+        grid-template-columns: 1.2fr 1fr;
+    }
+
+    .stat-box:last-child {
+        grid-column: span 2;
+    }
+
+    .coin-area {
+        height: 315px;
+    }
+
+    .coin {
+        width: 185px;
+        height: 185px;
+        font-size: 75px;
+    }
+
+    .coin-inner {
+        width: 145px;
+        height: 145px;
+    }
+
+    .daily-days {
+        gap: 3px;
+    }
+
+    .day {
+        min-height: 75px;
+    }
+
+    .day-reward {
+        font-size: 9px;
+    }
+
+    .quick-name {
+        font-size: 11px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
+
+    <!-- HEADER -->
 
     <div class="header">
-        <div class="logo">🌙🐾</div>
-        <div class="title">MoonPaw</div>
-        <div class="subtitle">Collect MoonPaw Points</div>
+
+        <div class="logo-area">
+
+            <div class="logo">🌙🐾</div>
+
+            <div>
+                <div class="logo-text">MOONPAW</div>
+                <div class="tagline">TAP. EARN. GROW.</div>
+            </div>
+
+        </div>
+
+        <div class="connected">
+            ✈️
+            <span>Mini App</span>
+            <span class="online"></span>
+        </div>
+
     </div>
 
-    <div class="balance">
 
-        <div class="points" id="points">
-            0
+    <!-- PROFILE -->
+
+    <div class="profile-card">
+
+        <div class="profile">
+
+            <div class="avatar">
+                🐱
+            </div>
+
+            <div>
+
+                <div class="username">
+                    Player 👑
+                </div>
+
+                <div class="level">
+                    Level 1 • Newbie
+                </div>
+
+                <div class="progress">
+                    <div
+                        class="progress-fill"
+                        id="levelProgress">
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="label">
-            MOONPAW POINTS
-        </div>
+        <div class="stat-box">
 
-        <div class="energy">
-            ⚡ Energy:
-            <span id="energy">100</span>/100
-        </div>
+            <div class="stat-title">
+                🐾 POINTS
+            </div>
 
-        <div class="energy-bar">
             <div
-                class="energy-fill"
-                id="energyFill">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="tap-area">
-
-        <button
-            class="tap-button"
-            id="tapButton">
-            🐾
-        </button>
-
-        <div class="tap-hint">
-            Tap to earn +1 🐾
-        </div>
-
-    </div>
-
-    <div class="buttons">
-
-        <button
-            class="menu-button"
-            onclick="showPanel('daily')">
-            🎁 Daily
-        </button>
-
-        <button
-            class="menu-button"
-            onclick="showPanel('invite')">
-            👥 Invite
-        </button>
-
-        <button
-            class="menu-button"
-            onclick="showPanel('rank')">
-            🏆 Rank
-        </button>
-
-        <button
-            class="menu-button"
-            onclick="showPanel('about')">
-            🌙 About
-        </button>
-
-    </div>
-
-    <!-- DAILY -->
-
-    <div
-        class="panel"
-        id="daily">
-
-        <h2>🎁 Daily Reward</h2>
-
-        <div class="info">
-            Come back every day and claim your reward.
-        </div>
-
-        <div class="reward">
-            +100 🐾
-        </div>
-
-        <button
-            class="action-button"
-            id="dailyButton"
-            onclick="claimDaily()">
-            Claim Daily Reward
-        </button>
-
-    </div>
-
-    <!-- INVITE -->
-
-    <div
-        class="panel"
-        id="invite">
-
-        <h2>👥 Invite Friends</h2>
-
-        <div class="info">
-            Invite friends to MoonPaw using your personal referral link.
-        </div>
-
-        <div class="referral-box" id="referralLink">
-            Creating link...
-        </div>
-
-        <button
-            class="action-button"
-            onclick="copyReferral()">
-            📋 Copy Referral Link
-        </button>
-
-        <div
-            class="message"
-            id="inviteMessage">
-        </div>
-
-    </div>
-
-    <!-- RANK -->
-
-    <div
-        class="panel"
-        id="rank">
-
-        <h2>🏆 Leaderboard</h2>
-
-        <div id="leaderboard">
-
-            <div class="rank-row">
-                <span>1. You</span>
-                <span id="yourRankPoints">0 🐾</span>
+                class="stat-value"
+                id="points">
+                0
             </div>
 
-            <div class="rank-row">
-                <span>2. MoonPaw Player</span>
-                <span>0 🐾</span>
-            </div>
-
-            <div class="rank-row">
-                <span>3. MoonPaw Player</span>
-                <span>0 🐾</span>
+            <div class="stat-small">
+                MOONPAW POINTS
             </div>
 
         </div>
 
-        <div class="message">
-            Real server leaderboard will be connected later.
-        </div>
+        <div class="stat-box">
+
+            <div class="stat-title">
+                ⚡ ENERGY
+            </div>
+
+            <div
+                class="stat-value"
+                id="energy">
+                1000
+            </div>
+
+            <div class="stat-small">
+                <span id="restoreTimer">03:00:00</span>
+            </div>
 
     </div>
-
-    <!-- ABOUT -->
-
-    <div
-        class="panel"
-        id="about">
-
-        <h2>🌙 About MoonPaw</h2>
-
-        <div class="info">
-            MoonPaw is a tap-to-earn style game where players
-            collect MoonPaw points, manage energy, claim daily
-            rewards and invite friends.
-            <br><br>
-            Current points are game points and have no guaranteed
-            monetary value.
-        </div>
-
-    </div>
-
-    <div
-        class="message"
-        id="mainMessage">
-    </div>
-
-    <div class="footer">
-        🌙🐾 MoonPaw
-    </div>
-
-</div>
-
-<script>
-
-const tg = window.Telegram && window.Telegram.WebApp;
-
-if (tg) {
-    tg.ready();
-    tg.expand();
-}
-
-
-/* =========================
-   GAME DATA
-========================= */
-
-const MAX_ENERGY = 1000;
-
-const REGEN_TIME = 1000;
-
-const DAILY_REWARD = 100;
-
-let points =
-    Number(localStorage.getItem("moonpaw_points")) || 0;
-
-let energy =
-    Number(localStorage.getItem("moonpaw_energy"));
-
-if (isNaN(energy)) {
-    energy = MAX_ENERGY;
-}
-
-let lastEnergyTime =
-    Number(localStorage.getItem("moonpaw_energy_time"));
-
-if (!lastEnergyTime) {
-    lastEnergyTime = Date.now();
-}
-
-let lastDaily =
-    localStorage.getItem("moonpaw_daily") || "";
-
-
-/* =========================
-   SAVE
-========================= */
-
-function saveData() {
-
-    localStorage.setItem(
-        "moonpaw_points",
-        points
-    );
-
-    localStorage.setItem(
-        "moonpaw_energy",
-        energy
-    );
-
-    localStorage.setItem(
-        "moonpaw_energy_time",
-        lastEnergyTime
-    );
-
-    localStorage.setItem(
-        "moonpaw_daily",
-        lastDaily
-    );
-}
-
-
-/* =========================
-   ENERGY
-========================= */
-
-function regenerateEnergy() {
-
-    const now = Date.now();
-
-    if (energy >= MAX_ENERGY) {
-        lastEnergyTime = now;
-        saveData();
-        return;
-    }
-
-    const elapsed =
-        now - lastEnergyTime;
-
-    const recovered =
-        Math.floor(elapsed / REGEN_TIME);
-
-    if (recovered > 0) {
-
-        energy =
-            Math.min(
-                MAX_ENERGY,
-                energy + recovered
-            );
-
-        lastEnergyTime +=
-            recovered * REGEN_TIME;
-
-        saveData();
-    }
-}
-
-
-/* =========================
-   SCREEN
-========================= */
-
-function updateScreen() {
-
-    regenerateEnergy();
-
-    document.getElementById(
-        "points"
-    ).textContent =
-        points.toLocaleString();
-
-    document.getElementById(
-        "energy"
-    ).textContent =
-        energy;
-
-    const percentage =
-        (energy / MAX_ENERGY) * 100;
-
-    document.getElementById(
-        "energyFill"
-    ).style.width =
-        percentage + "%";
-
-    document.getElementById(
-        "yourRankPoints"
-    ).textContent =
-        points.toLocaleString() + " 🐾";
-
-    const today =
-        new Date().toDateString();
-
-    const dailyButton =
-        document.getElementById(
-            "dailyButton"
-        );
-
-    if (lastDaily === today) {
-
-        dailyButton.disabled = true;
-
-        dailyButton.textContent =
-            "✅ Already Claimed";
-
-    } else {
-
-        dailyButton.disabled = false;
-
-        dailyButton.textContent =
-            "Claim Daily Reward";
-    }
-}
-
-
-/* =========================
-   TAP
-========================= */
-
-document.getElementById(
-    "tapButton"
-).addEventListener(
-    "click",
-    function() {
-
-        regenerateEnergy();
-
-        if (energy <= 0) {
-
-            showMessage(
-                "⚡ No energy! Wait for it to regenerate."
-            );
-
-            return;
-        }
-
-        points += 1;
-
-        energy -= 1;
-
-        if (energy < MAX_ENERGY &&
-            !lastEnergyTime) {
-
-            lastEnergyTime =
-                Date.now();
-        }
-
-        saveData();
-
-        updateScreen();
-
-        showMessage("+1 🐾");
-
-    }
-);
-
-
-/* =========================
-   DAILY
-========================= */
-
-function claimDaily() {
-
-    const today =
-        new Date().toDateString();
-
-    if (lastDaily === today) {
-
-        showMessage(
-            "🎁 You already claimed today's reward."
-        );
-
-        return;
-    }
-
-    points += DAILY_REWARD;
-
-    lastDaily = today;
-
-    saveData();
-
-    updateScreen();
-
-    showMessage(
-        "🎁 +" +
-        DAILY_REWARD +
-        " MoonPaw Points!"
-    );
-}
-
-
-/* =========================
-   PANELS
-========================= */
-
-function showPanel(name) {
-
-    const panels =
-        document.querySelectorAll(
-            ".panel"
-        );
-
-    panels.forEach(
-        function(panel) {
-            panel.classList.remove(
-                "active"
-            );
-        }
-    );
-
-    const selected =
-        document.getElementById(name);
-
-    if (selected) {
-        selected.classList.add(
-            "active"
-        );
-    }
-
-    if (name === "invite") {
-        createReferralLink();
-    }
-
-    if (name === "rank") {
-        updateLeaderboard();
-    }
-}
-
-
-/* =========================
-   REFERRAL
-========================= */
-
-function createReferralLink() {
-
-    let userId = null;
-
-    if (
-        tg &&
-        tg.initDataUnsafe &&
-        tg.initDataUnsafe.user
-    ) {
-
-        userId =
-            tg.initDataUnsafe.user.id;
-    }
-
-    if (!userId) {
-
-        userId =
-            "demo_" +
-            Math.floor(
-                Math.random() * 999999
-            );
-    }
-
-    const botUsername =
-        "MoonPaw_Airdropbot";
-
-    const link =
-        "https://t.me/" +
-        botUsername +
-        "?start=ref_" +
-        userId;
-
-    document.getElementById(
-        "referralLink"
-    ).textContent = link;
-}
-
-
-function copyReferral() {
-
-    const text =
-        document.getElementById(
-            "referralLink"
-        ).textContent;
-
-    if (
-        navigator.clipboard &&
-        navigator.clipboard.writeText
-    ) {
-
-        navigator.clipboard.writeText(
-            text
-        ).then(
-            function() {
-
-                document.getElementById(
-                    "inviteMessage"
-                ).textContent =
-                    "✅ Referral link copied!";
-
-            }
-        );
-
-    } else {
-
-        showMessage(
-            "📋 Copy the referral link manually."
-        );
-    }
-}
-
-
-/* =========================
-   LOCAL LEADERBOARD
-========================= */
-
-function updateLeaderboard() {
-
-    document.getElementById(
-        "yourRankPoints"
-    ).textContent =
-        points.toLocaleString() +
-        " 🐾";
-}
-
-
-/* =========================
-   MESSAGE
-========================= */
-
-let messageTimer;
-
-function showMessage(text) {
-
-    const message =
-        document.getElementById(
-            "mainMessage"
-        );
-
-    message.textContent = text;
-
-    clearTimeout(messageTimer);
-
-    messageTimer =
-        setTimeout(
-            function() {
-                message.textContent = "";
-            },
-            2000
-        );
-}
-
-
-/* =========================
-   AUTO ENERGY UPDATE
-========================= */
-
-setInterval(
-    function() {
-
-        regenerateEnergy();
-
-        updateScreen();
-
-    },
-    1000
-);
-
-
-/* =========================
-   START
-========================= */
-
-updateScreen();
-
-</script>
-
-</body>
-    </html>                
